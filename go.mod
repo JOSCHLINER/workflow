@@ -1,4 +1,4 @@
-module main
+module workflow
 
 go 1.18
 
