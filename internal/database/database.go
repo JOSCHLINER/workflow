@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"time"
-	"fmt"	
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -15,7 +15,7 @@ type Database struct {
 type Task struct {
 	ID        int64
 	Name      string
-	TimeSpent time.Time
+	TimeSpent float64
 	Active    bool
 	StartTime time.Time
 }
@@ -38,9 +38,9 @@ func (d *Database) CreateTasksTable() error {
 	sql := `CREATE TABLE IF NOT EXISTS tasks (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		title VARCHAR(255) NOT NULL,
-		time_spent DATETIME,
+		time_spent REAL DEFAULT 0,
 		active BOOLEAN DEFAULT 0,
-		start_time DATETIME
+		start_time DATETIME DEFAULT '0000-00-00 00:00:00'
 		);`
 
 	_, err := d.db.Exec(sql)
@@ -82,14 +82,13 @@ func (d *Database) GetAllTasks() ([]Task, error) {
 	defer res.Close()
 
 	var tasks []Task
-	sqlStartTime, sqlTimeSpent := "", ""
+	sqlStartTime := ""
 	for res.Next() {
 		var task Task
-		if err := res.Scan(&task.ID, &task.Name, &sqlStartTime, &task.Active, &sqlTimeSpent); err != nil {
+		if err := res.Scan(&task.ID, &task.Name, &task.TimeSpent, &task.Active, &sqlStartTime); err != nil {
 			return nil, err
 		}
-		
-		task.TimeSpent = convertToTime(sqlTimeSpent)
+
 		task.StartTime = convertToTime(sqlStartTime)
 
 		tasks = append(tasks, task)
@@ -97,6 +96,31 @@ func (d *Database) GetAllTasks() ([]Task, error) {
 
 	return tasks, nil
 }
+
+func (d *Database) GetActiveTasks() ([]Task, error) {
+
+	res, err := d.db.Query(`SELECT * FROM tasks WHERE active = 1`)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Close()
+
+	var tasks []Task
+	sqlStartTime := ""
+	for res.Next() {
+		var task Task
+		if err := res.Scan(&task.ID, &task.Name, &task.TimeSpent, &task.Active, &sqlStartTime); err != nil {
+			return nil, err
+		}
+
+		task.StartTime = convertToTime(sqlStartTime)
+
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
+}
+
 
 func (d *Database) StartTask(task *Task) error {
 
@@ -122,10 +146,7 @@ func (d *Database) StopTask(task *Task) error {
 
 	res, err := d.db.Exec(`UPDATE tasks 
 	SET active = 0,
-	    time_spent = time(
-		    strftime('%s', time_spent) + 
-		    (strftime('%s', 'now') - strftime('%s', start_time)), 'unixepoch' )
-	WHERE active = 1 and id = ?;`, task.ID)
+    time_spent = time_spent + ((strftime('%s', datetime('now')) - strftime('%s', start_time)) / 60) WHERE active = 1 and id = ?;`, task.ID)
 
 	if err != nil {
 		return err
@@ -141,19 +162,13 @@ func (d *Database) StopTask(task *Task) error {
 	return nil
 }
 
-
 func convertToTime(datetime string) time.Time {
 	layout := "2006-01-02T15:04:05Z"
 
 	parsedTime, err := time.Parse(layout, datetime)
 	if err != nil {
-		fmt.Println(datetime)
 		return time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC)
 	}
 
-
-	fmt.Println(parsedTime)
 	return parsedTime
 }
-
-
