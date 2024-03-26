@@ -6,13 +6,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "workflow",
 	Short: "Workflow is a tool designed to help keep track of your workflow.",
-	Long: ``,
+	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -35,5 +33,3 @@ func init() {
 	// remove the default completion command
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 }
-
-
