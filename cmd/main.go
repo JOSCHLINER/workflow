@@ -1,4 +1,4 @@
-package workflow
+package main
 
 import (
 	"workflow/internal/command"
