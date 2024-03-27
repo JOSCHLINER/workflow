@@ -18,7 +18,7 @@ var listCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		onlyActive, _ := cmd.Flags().GetBool("active")
 
-		if onlyActive == true {
+		if onlyActive {
 			handler.ListActiveTasks()
 		} else {
 			handler.ListAllTasks()

@@ -121,7 +121,6 @@ func (d *Database) GetActiveTasks() ([]Task, error) {
 	return tasks, nil
 }
 
-
 func (d *Database) StartTask(task *Task) error {
 
 	res, err := d.db.Exec(`UPDATE tasks SET active = 1,
