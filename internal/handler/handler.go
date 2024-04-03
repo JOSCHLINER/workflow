@@ -3,9 +3,9 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"os"
-	"text/tabwriter"
+	"strconv"
 	"workflow/internal/database"
+	"workflow/internal/tableformatter"
 )
 
 const path string = "./data.sqlite"
@@ -37,15 +37,7 @@ func ListAllTasks() {
 		fmt.Println("Error retrieving tasks from database!", err)
 	}
 
-	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', tabwriter.Debug)
-	defer w.Flush()
-
-	fmt.Fprintln(w, "Id:\tDescription:\tTime Spent:")
-
-	for _, task := range tasks {
-		line := fmt.Sprintf("%d\t%s\t%d", task.ID, task.Name, int(task.TimeSpent))
-		fmt.Fprintln(w, line)
-	}
+	printTasks(tasks)
 }
 
 func ListActiveTasks() {
@@ -55,17 +47,7 @@ func ListActiveTasks() {
 		fmt.Println("Error retrieving tasks from database!", err)
 	}
 
-	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', tabwriter.Debug)
-	defer w.Flush()
-
-	fmt.Fprintln(w, "Id:\tDescription:\tTime Spent:")
-	fmt.Fprintln(w, "%-10\t%-10\t%-10")
-	for _, task := range tasks {
-		line := fmt.Sprintf("%d\t%s\t%d", task.ID, task.Name, int(task.TimeSpent))
-		fmt.Fprintln(w, line)
-	}
-
-	w.Flush()
+	printTasks(tasks)
 }
 
 func CreateTask(name string) {
@@ -118,4 +100,22 @@ func getTask(id int) (database.Task, error) {
 	}
 
 	return task, nil
+}
+
+func printTasks(tasks []database.Task) {
+	formatter := tableformatter.NewTableFormatter()
+
+	taskList := tasksIntoListWithDesc(tasks)
+	fmt.Println(formatter.ConstructTable(taskList))
+}
+
+func tasksIntoListWithDesc(tasks []database.Task) [][]string {
+
+	taskList := [][]string{{"Id:", "Description:", "Time Spent:"}}
+	for _, task := range tasks {
+		items := []string{strconv.FormatInt(task.ID, 10), task.Name, strconv.Itoa(int(task.TimeSpent))}
+		taskList = append(taskList, items)
+	}
+
+	return taskList
 }
