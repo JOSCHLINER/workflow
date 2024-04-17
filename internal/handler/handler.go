@@ -24,7 +24,7 @@ func init() {
 	// connecting to database
 	db, err := database.Connect(homedir + path)
 	if err != nil {
-		panic("savefile can not be accessed, quitting...")
+		panic("savefile can not be accessed, quitting... \n Savefile should be placed under ~/.workflow/data.sqlite; if this directory does not exist please create it!")
 	}
 
 	dB = db
