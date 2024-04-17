@@ -161,6 +161,24 @@ func (d *Database) StopTask(task *Task) error {
 	return nil
 }
 
+func (d *Database) RemoveTask(task *Task) error {
+
+	res, err := d.db.Exec(`DELETE FROM tasks WHERE id = ?`, task.ID)
+
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	} else if rowsAffected == 0 {
+		return errors.New("task does not exist")
+	}
+
+	return nil
+}
+
 func convertToTime(datetime string) time.Time {
 	layout := "2006-01-02T15:04:05Z"
 

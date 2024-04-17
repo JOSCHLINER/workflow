@@ -76,6 +76,21 @@ func StartTask(id int) {
 	fmt.Println("Task has been started.")
 }
 
+func RemoveTask(id int) {
+	task, err := getTask(id)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if err := dB.RemoveTask(&task); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("Task has been removed.")
+}
+
 func StopTask(id int) {
 	task, err := getTask(id)
 	if err != nil {
