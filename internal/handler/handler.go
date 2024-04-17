@@ -3,19 +3,28 @@ package handler
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"workflow/internal/database"
 	"workflow/internal/tableformatter"
 )
 
-const path string = "./data.sqlite"
+const path string = "/.workflow/data.sqlite"
 
 var dB *database.Database
 
 func init() {
-	db, err := database.Connect(path)
+
+	// getting home directory of user calling
+	homedir, err := os.UserHomeDir()
 	if err != nil {
-		panic("Saved file can not be accessed, quitting...")
+		panic("home directory of user calling script not found, quitting...")
+	}
+
+	// connecting to database
+	db, err := database.Connect(homedir + path)
+	if err != nil {
+		panic("savefile can not be accessed, quitting...")
 	}
 
 	dB = db
