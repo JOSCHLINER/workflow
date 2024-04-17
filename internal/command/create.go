@@ -9,7 +9,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(createCmd)
-	createCmd.PersistentFlags().String("name", "", "Name of the task.")
+	createCmd.PersistentFlags().StringP("name", "n", "", "Name of the task.")
 }
 
 var createCmd = &cobra.Command{
