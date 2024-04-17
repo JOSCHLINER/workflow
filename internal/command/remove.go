@@ -9,7 +9,7 @@ import (
 func init() {
 	rootCmd.AddCommand(removeCmd)
 
-	removeCmd.PersistentFlags().Int("id", 0, "Id of task.")
+	removeCmd.PersistentFlags().IntP("id", "i", 0, "Id of task.")
 }
 
 var removeCmd = &cobra.Command{

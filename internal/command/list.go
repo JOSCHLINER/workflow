@@ -8,7 +8,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	listCmd.Flags().Bool("active", false, "List only the active tasks.")
+	listCmd.Flags().BoolP("active", "a", false, "List only the active tasks.")
 }
 
 var listCmd = &cobra.Command{
