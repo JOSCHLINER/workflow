@@ -3,6 +3,7 @@ package tableformatter
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
 type TableFormatter struct {
@@ -65,7 +66,7 @@ func (tf *TableFormatter) getSpacing(items [][]string) {
 	for _, row := range items {
 		for c, column := range row {
 
-			if n := len(column); n > tf.Spacing[c] {
+			if n := utf8.RuneCountInString(column); n > tf.Spacing[c] {
 				tf.Spacing[c] = n
 			}
 
@@ -77,7 +78,7 @@ func (tf *TableFormatter) constructRow(items []string) string {
 
 	padding, line := strings.Repeat(" ", tf.Options.padding), ""
 	for i, item := range items {
-		filler := strings.Repeat(" ", tf.Spacing[i]-len(item)+1)
+		filler := strings.Repeat(" ", tf.Spacing[i]-utf8.RuneCountInString(item)+1)
 		line += fmt.Sprintf("| %s%s%s", padding, item, filler)
 	}
 
